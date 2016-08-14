@@ -10,4 +10,4 @@ inputs:
 - name: flight-school2
 
 run:
-  path: ./flight-school/ci/test.sh
+  path: ./flight-school2/ci/test.sh
