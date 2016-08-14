@@ -21,10 +21,10 @@ jobs:
     - get: flight-school2
       trigger: true
     - task: tests
-      file: flight-school/build.yml
+      file: flight-school2/build.yml
     - put: staging-app
       params:
-        manifest: flight-school/manifest.yml
+        manifest: flight-school2/manifest.yml
 
   - name: deploy
     serial: true
