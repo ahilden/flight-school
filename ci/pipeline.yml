@@ -1,5 +1,23 @@
 resources:
+- name: QA-1.0.1001
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
 - name: flight-school2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: DB2-Server-11.1.20123
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: Console-1.2
   type: git
   source:
     uri: https://github.com/ahilden/flight-school
@@ -10,30 +28,37 @@ resources:
   source:
     api: https://api.ng.bluemix.net
     username: ahilden@ca.ibm.com
-    password: add66son
+    password: add44son
     organization: ahilden@ca.ibm.com
     space: dev
 
+
+- name: dashDB-Snapshot-1.2.32.1
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master 
 
 jobs:
   - name: test-app
     plan:
     - get: flight-school2
       trigger: true
+    - get: Console-1.2
+    - get: DB2-Server-11.1.20123
+    - get: QA-1.0.1001
     - task: tests
       file: flight-school2/build.yml
-    - put: staging-app
-      params:
-        manifest: flight-school2/manifest.yml
+    - put: dashDB-Snapshot-1.2.32.1
 
-  - name: deploy
+  - name: deploy-to-bluemix
     serial: true
     plan:
       - aggregate:
-          - get: flight-school2
+          - get: dashDB-Snapshot-1.2.32.1
             passed: [test-app]
-      - task: deploy-to-bluemix
-        file: release/ci/deploy.yml
+            trigger: true
       - put: staging-app 
-
+        params:
+          manifest: flight-school2/manifest.yml
 
