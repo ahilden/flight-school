@@ -49,13 +49,12 @@ jobs:
     - get: QA-1.0.1001
     - task: tests
       file: flight-school2/build.yml
-    - put: dashDB-Snapshot-1.2.32.1
 
   - name: deploy-to-bluemix
     serial: true
     plan:
       - aggregate:
-          - get: dashDB-Snapshot-1.2.32.1
+          - get: flight-school2
             passed: [test-app]
             trigger: true
       - put: staging-app 
