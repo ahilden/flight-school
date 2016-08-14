@@ -1,14 +1,39 @@
 resources:
-- name: flight-school
+- name: flight-school2
   type: git
   source:
     uri: https://github.com/ahilden/flight-school
     branch: master
 
+- name: staging-app
+  type: cf
+  source:
+    api: https://api.ng.bluemix.net
+    username: ahilden@ca.ibm.com
+    password: add66son
+    organization: ahilden@ca.ibm.com
+    space: dev
+
+
 jobs:
-- name: test-app
-  plan:
-  - get: flight-school
-    trigger: true
-  - task: tests
-    file: flight-school/build.yml
+  - name: test-app
+    plan:
+    - get: flight-school2
+      trigger: true
+    - task: tests
+      file: flight-school/build.yml
+    - put: staging-app
+      params:
+        manifest: flight-school/manifest.yml
+
+  - name: deploy
+    serial: true
+    plan:
+      - aggregate:
+          - get: flight-school2
+            passed: [test-app]
+      - task: deploy-to-bluemix
+        file: release/ci/deploy.yml
+      - put: staging-app 
+
+
