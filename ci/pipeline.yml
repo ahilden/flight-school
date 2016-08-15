@@ -5,7 +5,7 @@ resources:
     uri: https://github.com/ahilden/flight-school
     branch: master
 
-- name: flight-school2
+- name: S55SnapShot-08142016 
   type: git
   source:
     uri: https://github.com/ahilden/flight-school
@@ -23,6 +23,61 @@ resources:
     uri: https://github.com/ahilden/flight-school
     branch: master
 
+- name: mpp-1.3
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: deploy-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: update-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: aws-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: security-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: monitoring-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: operations-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: softlayer-1.2
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+- name: transactional-1.0.121
+  type: git
+  source:
+    uri: https://github.com/ahilden/flight-school
+    branch: master
+
+
 - name: staging-app
   type: cf
   source:
@@ -33,6 +88,9 @@ resources:
     space: dev
 
 
+
+
+
 - name: dashDB-Snapshot-1.2.32.1
   type: git
   source:
@@ -40,24 +98,71 @@ resources:
     branch: master 
 
 jobs:
-  - name: test-app
+  - name: DB2-Server-CVT
     plan:
-    - get: flight-school2
-      trigger: true
-    - get: Console-1.2
     - get: DB2-Server-11.1.20123
-    - get: QA-1.0.1001
+  - name: Console-CVT
+    plan:
+    - get: Console-1.2
+  - name: mpp-CVT
+    plan:
+    - get: mpp-1.3
+  - name: deploy-CVT
+    plan:
+    - get: deploy-1.2
+  - name: update-CVT
+    plan:
+    - get: update-1.2
+  - name: aws-CVT
+    plan:
+    - get: aws-1.2
+  - name: security-CVT
+    plan:
+    - get: security-1.2
+  - name: monitoring-CVT
+    plan:
+    - get: monitoring-1.2
+  - name: operations-CVT
+    plan:
+    - get: operations-1.2
+  - name: transactional-CVT
+    plan:
+    - get: transactional-1.0.121
+  - name: softlayer_CVT
+    plan:
+    - get: softlayer-1.2 
+  - name: snapshot-build
+    plan:
+    - get: S55SnapShot-08142016 
+      trigger: true
     - task: tests
-      file: flight-school2/build.yml
+      file: S55SnapShot-08142016/build.yml
 
-  - name: deploy-to-bluemix
+  - name: basic-validation
     serial: true
     plan:
       - aggregate:
-          - get: flight-school2
-            passed: [test-app]
+          - get: S55SnapShot-08142016
+            passed: [snapshot-build]
             trigger: true
-      - put: staging-app 
+      - put: S55SnapShot-08142016
         params:
-          manifest: flight-school2/manifest.yml
+          manifest: S55SnapShot-08142016/manifest.yml
+
+  - name: deploy-validation
+    plan:
+      - aggregate:
+          - get: S55SnapShot-08142016
+            passed: [basic-validation]
+            trigger: true
+      - put: S55SnapShot-08142016
+        params:
+          manifest: S55SnapShot-08142016/manifest.yml
+
+  - name: update-validation
+    plan:
+      - aggregate:
+          - get: S55SnapShot-08142016
+            passed: [basic-validation]
+            trigger: true
 

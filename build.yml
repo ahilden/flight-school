@@ -7,7 +7,7 @@ image_resource:
     tag: 2.3.0
 
 inputs:
-- name: flight-school2
+- name: S55SnapShot-08142016 
 
 run:
-  path: ./flight-school2/ci/test.sh
+  path: ./S55SnapShot-08142016/ci/test.sh
